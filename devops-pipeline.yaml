@@ -4,14 +4,30 @@ name: ($date:yyyyMMdd)$(rev:.rr) #20190910.00
 
 stages:
   - stage: 'build'
-    displayName: 'build-mvc' # literal
+    condition: succeeded()
+    displayName: 'build-mvc'
     jobs:
       - job:
-        displayName:
+        condition: succeeded()
+        displayName: 'build-process'
         pool:
           vmImage: 'ubuntu-16.04'
         steps:
-          - step:
-            displayName:
-              - script: |
-                  echo 'Hello Pipeline'
+          - scripts: |
+              echo 'build passed...'
+
+  - stage: 'test'
+    condition: succeeded('build')
+    dependsOn: 
+      - build
+    displayName: 'test-mvc' 
+
+  - stage: 'pack'
+  - stage: 'deploy'
+
+triggers:
+  - branches:
+      include:
+        - master
+
+variables:
